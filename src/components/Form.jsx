@@ -1,34 +1,39 @@
 import React from "react";
 import { useParams, useHistory } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { createProject, editProject } from "../api";
 import NavBar from "./NavBar.jsx";
+import { getProject } from '../api.js'
+
 
 export default function Form(props) {
-  const { formData, setFormData, fetchProject, type } = props || {};
-  const [edit, setEdit] = useState(false);
+  const { formData, setFormData } = props
+  const history = useHistory()
   const { id } = useParams();
-  const history = useHistory();
-  console.log(type);
 
   useEffect(() => {
-    if (type === "newForm") {
-      // setFormData({});
-      setEdit(false);
-      history.push("/");
-    } else if (type === "filledForm") {
-      setEdit(true);
-      fetchProject && fetchProject(id);
-    }
+    const fetchProject = async () => {
+      setFormData({})
+      if (id) {
+        const res = await getProject(id);
+        res && setFormData(res.fields);
+      }
+      console.log(formData)
+    };
+    fetchProject()
     //eslint-disable-next-line
-  }, []);
+  }, [id]);
 
-  console.log(edit);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (type === "filledForm") {
+    if (id) {
       await editProject(id, formData);
-    } else await createProject(formData);
+    } else {
+      console.log("running")
+      await createProject(formData);
+    }
+    history.push('/pr')
   };
 
   const handleChange = (e) => {
@@ -39,9 +44,12 @@ export default function Form(props) {
     }));
   };
 
+
   return (
     <div className="form-inner-wrapper">
+
       <NavBar />
+
       <form
         className="form-container"
         onChange={handleChange}
@@ -52,7 +60,7 @@ export default function Form(props) {
           id="projName"
           type="text"
           name="projectName"
-          value={id && formData?.projectName}
+          value={formData.projectName ?? ''}
         />
         <br />
         <label htmlFor="initialInvestment">Initial Investment: </label>
@@ -60,7 +68,7 @@ export default function Form(props) {
           id="initialInvestment"
           type="number"
           name="initialInvestment"
-          value={formData?.initialInvestment}
+          value={formData.initialInvestment ?? ''}
         />
         <br />
         <label htmlFor="addCapital">Additional Capital: </label>
@@ -68,7 +76,8 @@ export default function Form(props) {
           id="addCapital"
           type="number"
           name="additionalCapital"
-          value={formData?.additionalCapital}
+          defaultValue=''
+          value={formData.additionalCapital ?? ''}
         />
         <br />
         <label htmlFor="holdPeriod">Hold Period: </label>
@@ -76,7 +85,7 @@ export default function Form(props) {
           id="holdPeriod"
           type="number"
           name="holdPeriod"
-          value={formData?.holdPeriod}
+          value={formData.holdPeriod ?? ''}
         />
         <br />
         <label htmlFor="annualRev">Annual Revenue: </label>
@@ -84,7 +93,7 @@ export default function Form(props) {
           id="annualRev"
           type="number"
           name="annualRevenue"
-          value={formData?.annualRevenue}
+          value={formData.annualRevenue ?? ''}
         />
         <br />
         <label htmlFor="annualExp">Annual Expense: </label>
@@ -92,7 +101,7 @@ export default function Form(props) {
           id="annualExp"
           type="number"
           name="annualExpense"
-          value={formData?.annualExpense}
+          value={formData.annualExpense ?? ''}
         />
         <br />
         <label htmlFor="closingCost">Closing Cost: </label>
@@ -100,7 +109,7 @@ export default function Form(props) {
           id="closingCost"
           type="number"
           name="closingCost"
-          value={formData?.closingCost}
+          value={formData.closingCost ?? ''}
         />
         <br />
         <label htmlFor="growthRev">Revenue Growth Rate: </label>
@@ -108,7 +117,7 @@ export default function Form(props) {
           id="growthRev"
           type="number"
           name="revenueGrowthRate"
-          value={formData?.revenueGrowthRate}
+          value={formData.revenueGrowthRate ?? ''}
         />
         <br />
         <label htmlFor="growthExp">Expense Growth Rate: </label>
@@ -116,7 +125,7 @@ export default function Form(props) {
           id="growthExp"
           type="number"
           name="expenseGrowthRate"
-          value={formData?.expenseGrowthRate}
+          value={formData.expenseGrowthRate ?? ''}
         />
         <br />
         <label htmlFor="capRate">Cap Rate: </label>
@@ -124,7 +133,7 @@ export default function Form(props) {
           id="capRate"
           type="number"
           name="capRate"
-          value={formData?.capRate}
+          value={formData.capRate ?? ''}
         />
         <br />
         <button type="submit">Submit</button>

@@ -5,41 +5,46 @@ import { Link } from "react-router-dom";
 import NavBar from "./NavBar.jsx";
 
 export default function PrevResults() {
-  const [project, setProject] = useState([]);
+  const [projects, setProjects] = useState([]);
 
+  const fetchData = async () => {
+    const res = await showPrevious();
+    // console.log(res);
+    setProjects(res);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await showPrevious();
-      // console.log(res);
-      setProject(res);
-    };
     fetchData();
   }, []);
 
-  const handleDelete = async (e) => {
-    console.log(e.target.innerHTML);
-    await deleteProject(e.target.innerHTML);
+  const handleDelete = async (id) => {
+    // console.log(e.target.innerHTML);
+    await deleteProject(id);
+    const project = projects.find(project => project.id = id)
+    projects.splice(projects.indexOf(project), 1)
+    setProjects([...projects])
+    // fetchData()
+
   };
 
   return (
     <div>
       <NavBar />
-      {project &&
-        project.map((input) => {
+      {projects &&
+        projects.map((project) => {
           return (
-            <div key={input.id}>
-              <h2>Project Name: {input.fields.projectName}</h2>
-              <p>Initial Investment: {input.fields.initialInvestment}</p>
-              <p>Additional Capital: {input.fields.additionalCapital}</p>
-              <p>Annual Revenue: {input.fields.annualRevenue}</p>
-              <p>Annual Expense: {input.fields.annualExpense}</p>
-              <p>Closing Cost: {input.fields.closingCost}</p>
-              <p>Revenue Growth Rate: {input.fields.revenueGrowthRate}</p>
-              <p>Expense Growth Rate: {input.fields.expenseGrowthRate}</p>
-              <p>Hold Period: {input.fields.holdPeriod}</p>
-              <p>Cap Rate: {input.fields.capRate}</p>
-              <Link to={`/edit/pr/${input.id}`}>Edit</Link>
-              <button onClick={handleDelete}>{input.id}</button>
+            <div key={project.id}>
+              <h2>Project Name: {project.fields.projectName}</h2>
+              <p>Initial Investment: {project.fields.initialInvestment}</p>
+              <p>Additional Capital: {project.fields.additionalCapital}</p>
+              <p>Annual Revenue: {project.fields.annualRevenue}</p>
+              <p>Annual Expense: {project.fields.annualExpense}</p>
+              <p>Closing Cost: {project.fields.closingCost}</p>
+              <p>Revenue Growth Rate: {project.fields.revenueGrowthRate}</p>
+              <p>Expense Growth Rate: {project.fields.expenseGrowthRate}</p>
+              <p>Hold Period: {project.fields.holdPeriod}</p>
+              <p>Cap Rate: {project.fields.capRate}</p>
+              <Link to={`/edit/pr/${project.id}`}>Edit</Link>
+              <button onClick={()=> handleDelete(project.id)}>Delete</button>
             </div>
           );
         })}
